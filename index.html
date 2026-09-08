@@ -73,6 +73,8 @@
   .footer-author{margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);padding:9px 18px;border-radius:999px;font-weight:600}
   .footer-author a{color:#a7f3d0;font-weight:700}
   .footer-author a:hover{color:#d1fae5}
+  .footer-author .footer-sep{opacity:.5}
+  .footer-author .src-link{margin-left:2px}
 
   .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
   .reveal.in{opacity:1;transform:none}
@@ -178,6 +180,9 @@
     <div class="footer-author">
       <span data-i18n="foot_by">Made by</span>
       <a href="https://68110923.github.io/" target="_blank" rel="noopener">68110923</a>
+      <span class="footer-sep">·</span>
+      <span data-i18n="foot_src">Source code</span>
+      <a href="https://github.com/68110923/woocommerce-storefront" target="_blank" rel="noopener" data-i18n="foot_src_link">woocommerce-storefront</a>
     </div>
   </footer>
 
@@ -205,7 +210,9 @@
         cus_tag:"Customize", cus_title:"Tune the brand in one place.", cus_sub:"Colors and the gradient are CSS variables at the top of common.css.",
         foot_brand:"E-commerce Independent Site Frontend", foot_desc:" · WooCommerce + WordPress · Custom Astra mu-plugin design system",
         foot_lic:"WordPress core, Astra & WooCommerce are GPL; this custom code is MIT. Credentials & database are not included.",
-        foot_by:"Made by"
+        foot_by:"Made by",
+        foot_src:"Source code",
+        foot_src_link:"woocommerce-storefront"
       },
       zh:{
         eyebrow:"WooCommerce · WordPress · Astra",
@@ -229,7 +236,9 @@
         cus_tag:"自定义", cus_title:"一处调整品牌配色。", cus_sub:"颜色与渐变是 common.css 顶部的 CSS 变量。",
         foot_brand:"电商独立站前端设计系统", foot_desc:" · WooCommerce + WordPress · 自定义 Astra mu-plugin 设计系统",
         foot_lic:"WordPress 内核、Astra 与 WooCommerce 为 GPL；本自定义代码为 MIT。仓库不含凭据与数据库。",
-        foot_by:"作者"
+        foot_by:"作者",
+        foot_src:"源码",
+        foot_src_link:"woocommerce-storefront"
       }
     };
     function applyLang(lang){
