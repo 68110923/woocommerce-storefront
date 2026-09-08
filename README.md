@@ -33,7 +33,7 @@
 
 - **WordPress** + **WooCommerce**(托管运行时)
 - **Astra 主题**(不修改原主题文件)
-- **mu-plugin**(`wp-content/mu-plugins/puffgoods-branding.php`)注入样式/脚本/短代码/页脚
+- **mu-plugin**(`wp-content/mu-plugins/shopfront-branding.php`)注入样式/脚本/短代码/页脚
 - 原生 **CSS** + 轻量 **jQuery**(`IntersectionObserver` + 少量 DOM 操作,无重动画库)
 
 ---
@@ -46,8 +46,8 @@
 ├── index.html                     # GitHub Pages 项目展示页(仓库首页)
 └── wp-content/
     └── mu-plugins/
-        ├── puffgoods-branding.php # 设计系统入口:enqueue、短代码、购物车抽屉、页脚
-        └── puffgoods-assets/
+        ├── shopfront-branding.php # 设计系统入口:enqueue、短代码、购物车抽屉、页脚
+        └── shopfront-assets/
             ├── common.css         # 设计系统基础:变量、页头、按钮、商品卡、轮播、页脚
             ├── common.js          # 吸顶页头、滚动进场、age-gate、购物车抽屉、加购动效、轮播
             ├── desktop.css        # 桌面端微调
@@ -58,13 +58,13 @@
             └── mobile.js
 ```
 
-> 说明:为实现"首页通铺 + 内容优先",我还重写了首页页面内容(post),把首屏包进 `.pg-hero-wrap`,并把信任徽章/分类/商品放到首屏下方的 `.pg-content-after`。这部分是页面内容而非文件,如需迁移可参考 `mu-plugins/puffgoods-branding.php` 里的输出逻辑。
+> 说明:为实现"首页通铺 + 内容优先",我还重写了首页页面内容(post),把首屏包进 `.pg-hero-wrap`,并把信任徽章/分类/商品放到首屏下方的 `.pg-content-after`。这部分是页面内容而非文件,如需迁移可参考 `mu-plugins/shopfront-branding.php` 里的输出逻辑。
 
 ---
 
 ## 🚀 使用方式(在 WordPress 站点上)
 
-1. 把 `wp-content/mu-plugins/puffgoods-branding.php` 和 `wp-content/mu-plugins/puffgoods-assets/` 放进目标站点的 `wp-content/mu-plugins/`(mu-plugin 自动生效,无需在后台启用)。
+1. 把 `wp-content/mu-plugins/shopfront-branding.php` 和 `wp-content/mu-plugins/shopfront-assets/` 放进目标站点的 `wp-content/mu-plugins/`(mu-plugin 自动生效,无需在后台启用)。
 2. 站点需已安装 **WooCommerce** 并开启商品。
 3. 首页内容通过区块编辑器写入:
    ```html
