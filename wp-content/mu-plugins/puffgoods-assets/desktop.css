@@ -1,0 +1,5 @@
+/* Puffgoods 桌面端 CSS (min-width:1025px) */
+@media (min-width:1025px) {
+  .pg-section-title { font-size:2.1rem; }
+  .pg-footer .pg-grid { grid-template-columns:2fr 1fr 1fr 1fr; }
+}

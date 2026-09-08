@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Puffgoods — WooCommerce / WordPress Store Frontend</title>
+<meta name="description" content="A custom frontend design system for a WooCommerce / WordPress online store (tobacco & e-cigarettes). Green + purple, content-first, responsive." />
+<style>
+  :root{
+    --green:#16a34a; --green-d:#0e7a37;
+    --purple:#7c3aed; --purple-d:#6d28d9;
+    --ink:#0f172a; --muted:#64748b; --soft:#e5e7eb;
+    --grad:linear-gradient(135deg,#16a34a,#7c3aed);
+    --card:rgba(255,255,255,.82);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+    color:var(--ink); line-height:1.6; background:#fafafa;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--purple);text-decoration:none}
+  a:hover{color:var(--purple-d)}
+
+  /* ---- hero ---- */
+  .hero{
+    position:relative; overflow:hidden; color:#fff; text-align:center;
+    padding:96px 24px 88px; background:linear-gradient(140deg,#16a34a 0%,#0e7490 55%,#7c3aed 100%);
+  }
+  .hero:before{content:"";position:absolute;top:-120px;left:-120px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.12);filter:blur(30px)}
+  .hero:after{content:"";position:absolute;bottom:-120px;right:-100px;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.10);filter:blur(30px)}
+  .hero-in{position:relative;max-width:900px;margin:0 auto;z-index:1}
+  .eyebrow{display:inline-block;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:6px 14px;border-radius:999px;margin-bottom:22px}
+  .hero h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:800;line-height:1.1;letter-spacing:-.5px;margin-bottom:14px}
+  .hero p.lead{font-size:clamp(1.02rem,1.7vw,1.25rem);color:rgba(255,255,255,.94);max-width:720px;margin:0 auto 30px}
+  .cta{display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  .btn{display:inline-block;padding:14px 28px;border-radius:12px;font-weight:700;transition:transform .2s ease,box-shadow .2s ease}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-primary{background:#7c3aed;color:#fff;box-shadow:0 12px 30px rgba(124,58,237,.35)}
+  .btn-ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(4px)}
+
+  .logo-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:34px}
+  .chip{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);padding:8px 16px;border-radius:999px;font-size:.85rem;font-weight:600;color:#fff}
+
+  /* ---- sections ---- */
+  section{max-width:1040px;margin:0 auto;padding:64px 24px}
+  .tag{color:var(--purple);font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;margin-bottom:12px;display:block}
+  section > h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;letter-spacing:-.4px;margin-bottom:12px}
+  section > p.sub{color:var(--muted);max-width:680px;margin-bottom:32px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--soft);border-radius:var(--radius);padding:24px;transition:transform .25s ease,box-shadow .25s ease}
+  .card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(15,23,42,.10)}
+  .card .ico{font-size:1.6rem;margin-bottom:12px}
+  .card h3{font-size:1.08rem;font-weight:700;margin-bottom:8px}
+  .card p{color:var(--muted);font-size:.92rem}
+
+  .content{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
+  @media(max-width:820px){.content{grid-template-columns:1fr}}
+  .content h3{font-size:1.3rem;margin-bottom:12px}
+  .content p{color:var(--muted)}
+  pre{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:18px 20px;overflow-x:auto;font-size:.82rem;line-height:1.5}
+  pre code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}
+
+  .stack{display:flex;gap:12px;flex-wrap:wrap}
+  .stack span{background:#fff;border:1px solid var(--soft);padding:10px 18px;border-radius:10px;font-weight:600;font-size:.9rem}
+
+  footer{background:#0f172a;color:#94a3b8;text-align:center;padding:40px 24px;font-size:.88rem}
+  footer b{color:#e2e8f0}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-in">
+      <span class="eyebrow">WooCommerce · WordPress · Astra</span>
+      <h1>Puffgoods Store Frontend</h1>
+      <p class="lead">A custom frontend design system for an Australian online store (tobacco &amp; e-cigarettes). One continuous green→purple canvas, a content-first full-screen hero, and a glass sticky header — all injected as a WordPress mu-plugin, with the theme left untouched.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#features">Explore Features</a>
+        <a class="btn btn-ghost" href="#structure">Repo Structure</a>
+      </div>
+      <div class="logo-row">
+        <span class="chip">Green + Purple brand</span>
+        <span class="chip">Responsive (desktop / tablet / mobile)</span>
+        <span class="chip">18+ age gate</span>
+        <span class="chip">Cart drawer</span>
+      </div>
+    </div>
+  </header>
+
+  <section id="features">
+    <span class="tag">Features</span>
+    <h2>Everything the storefront needs, in one design system.</h2>
+    <p class="sub">CSS/JS split into common / desktop / tablet / mobile. Lightweight — native CSS + a touch of jQuery via IntersectionObserver. No heavy animation library.</p>
+
+    <div class="grid">
+      <div class="card"><div class="ico">🎨</div><h3>Unified gradient canvas</h3><p>A single green→purple gradient fills the whole viewport edge-to-edge on every page — no disjointed white blocks.</p></div>
+      <div class="card"><div class="ico">🎠</div><h3>Product carousel hero</h3><p>Content-first homepage: brand tagline + an auto-rotating product carousel spread edge-to-edge, from a <code>[pg_products_carousel]</code> shortcode.</p></div>
+      <div class="card"><div class="ico">🧊</div><h3>Glass sticky header</h3><p>Logo + menu + cart (with live count badge) sit in one flex row, right-aligned, blending into the translucent dark header — then turn solid on scroll.</p></div>
+      <div class="card"><div class="ico">🛒</div><h3>Cart drawer</h3><p>Click the header cart → a side drawer slides in. Adding a product flies it into the cart with a little bump animation.</p></div>
+      <div class="card"><div class="ico">🗂️</div><h3>Trust badges &amp; category cards</h3><p>Glassy trust pills (free over $80, 48h dispatch, full tracking, 4–5 days) and big Shop-by-Category cards with hover motion.</p></div>
+      <div class="card"><div class="ico">📱</div><h3>Fully responsive</h3><p>Desktop / tablet / mobile. On phones the oversized carousel is hidden and core info is shown first — truly mobile-first.</p></div>
+      <div class="card"><div class="ico">🛡️</div><h3>18+ age gate</h3><p>Compliance for the tobacco/vape category: a smooth age-verification modal on first visit, with the choice remembered.</p></div>
+      <div class="card"><div class="ico">✨</div><h3>Scroll reveal + toasts</h3><p>Sections fade/slide in as they enter the viewport (IntersectionObserver). Action feedback via slide-in toasts.</p></div>
+      <div class="card"><div class="ico">♿</div><h3>Reduced-motion support</h3><p>Respects <code>prefers-reduced-motion</code>, disabling most animation for accessibility.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag">Approach</span>
+    <h2>Content-first homepage (no hidden content).</h2>
+    <p class="sub">The homepage is a plain full-screen cover — it scrolls away as one piece, revealing the real store below. Nothing fades out or gets hidden.</p>
+    <div class="content">
+      <div>
+        <h3>Why it works</h3>
+        <p>Entering the site lands you on the core (logo, menu, brand line, featured products). Scrolling brings up trust badges, categories, best sellers, contact and footer — all always visible, never animated away. The hero is a normal 100vh section: simplest, most stable, and nothing gets lost.</p>
+      </div>
+      <pre><code>&lt;div class="pg-hero-wrap"&gt;
+  &lt;div id="pg-bubble"&gt;
+    &lt;div class="pg-bubble-inner"&gt;
+      &lt;p class="pg-hero-tagline"&gt;…&lt;/p&gt;
+      &lt;div class="pg-hero-carousel"&gt;
+        [pg_products_carousel limit="6"]
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="pg-content-after"&gt;
+  …trust badges / categories / products…
+&lt;/div&gt;</code></pre>
+    </div>
+  </section>
+
+  <section id="structure">
+    <span class="tag">Structure</span>
+    <h2>A clean, upgrade-safe layout.</h2>
+    <p class="sub">All customization lives in a <b>mu-plugin</b> — the theme and plugins stay untouched, so updates won't break your design.</p>
+    <pre><code>wp-content/
+  mu-plugins/
+    puffgoods-branding.php      # enqueue assets, shortcode, cart drawer, footer
+    puffgoods-assets/
+      common.css  common.js     # design system, header, buttons, cards, carousel
+      desktop.css tablet.css mobile.css   # per-breakpoint tweaks
+      desktop.js  tablet.js  mobile.js</code></pre>
+    <div style="margin-top:24px" class="stack">
+      <span>WordPress</span><span>WooCommerce</span><span>Astra theme</span><span>mu-plugin</span><span>CSS vars</span><span>IntersectionObserver</span>
+    </div>
+  </section>
+
+  <section>
+    <span class="tag">Customize</span>
+    <h2>Tune the brand in one place.</h2>
+    <p class="sub">Colors and the gradient are CSS variables at the top of <code>common.css</code>.</p>
+    <pre><code>:root {
+  --pg-green:  #16a34a;  --pg-green-d:  #0e7a37;
+  --pg-purple: #7c3aed;  --pg-purple-d: #6d28d9;
+  --pg-grad: linear-gradient(135deg, #16a34a, #7c3aed);
+}</code></pre>
+  </section>
+
+  <footer>
+    <p><b>Puffgoods Store Frontend</b> · WooCommerce + WordPress · Custom Astra mu-plugin design system</p>
+    <p style="margin-top:8px">Examples / docs in the repo. WordPress core, Astra &amp; WooCommerce are GPL; this custom code is MIT. Credentials &amp; database are not included.</p>
+  </footer>
+
+  <script>
+    (function(){
+      var els=document.querySelectorAll('.reveal');
+      // minimal reveal for landing polish
+      var obs=new IntersectionObserver(function(en){en.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});},{threshold:.12});
+      document.querySelectorAll('section').forEach(function(s,i){s.classList.add('reveal');obs.observe(s);});
+    })();
+  </script>
+</body>
+</html>

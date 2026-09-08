@@ -1,0 +1,7 @@
+/* Puffgoods 手机端 CSS (max-width:767px) */
+@media (max-width:767px) {
+  .woocommerce ul.products { grid-template-columns:1fr; gap:16px; }
+  .pg-footer .pg-grid { grid-template-columns:1fr 1fr; }
+  .pg-cart-icon { right:16px; bottom:16px; width:54px; height:54px; }
+  .pg-hero { min-height:calc(100vh - 60px)!important; }
+}

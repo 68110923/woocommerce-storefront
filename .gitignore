@@ -1,0 +1,32 @@
+# ---- WordPress secrets / config (NEVER commit these) ----
+wp-config.php
+wp-config-sample.php
+*.sql
+*.sql.gz
+*.bak
+
+# ---- Uploads / media (business assets) ----
+wp-content/uploads/
+wp-content/backup-*
+
+# ---- Environment / credentials ----
+.env
+.env.*
+*.env
+config.secrets.php
+credentials.json
+*.pem
+*.key
+
+# ---- Runtime / OS ----
+node_modules/
+vendor/
+.DS_Store
+Thumbs.db
+*.log
+
+# ---- Private docs / assets (not for public repo) ----
+puffgoods-requirements.md
+puffgoods-frontend-design.md
+puffgoods-logo.png
+puffgoods-orig.webp
