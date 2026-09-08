@@ -1,4 +1,4 @@
-# Puffgoods — WooCommerce / WordPress Store Frontend
+# E-commerce Independent Site Frontend — WooCommerce / WordPress
 
 ![MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![WordPress](https://img.shields.io/badge/WordPress-7.1-blue?style=flat-square)
@@ -6,9 +6,8 @@
 ![Astra](https://img.shields.io/badge/Theme-Astra-blueviolet?style=flat-square)
 ![PHP](https://img.shields.io/badge/PHP-8.0+-777bb4?style=flat-square)
 ![Frontend](https://img.shields.io/badge/Frontend-HTML%2FCSS%2FJS-orange?style=flat-square)
-![Built with ♥](https://img.shields.io/badge/Storefront-Puffgoods-ff69b4?style=flat-square)
 
-> 面向澳大利亚市场的烟草 & 电子烟在线商店前端设计。品牌配色 **绿 + 紫**,风格简约、大气、高级感。基于 **Astra 主题 + WooCommerce**,通过一个 **mu-plugin(站点插件)** 注入整套自定设计系统,不动主题源码,便于升级维护。
+> 面向海外市场的 **WooCommerce / WordPress 电商独立站前端设计系统**。一套可复用的店面前端设计,风格简约、大气、高级感。基于 **Astra 主题 + WooCommerce**,通过一个 **mu-plugin(站点插件)** 注入整套自定设计系统,不动主题源码,便于升级维护。
 
 > ⚠️ 本仓库只包含**前端/主题定制代码**,不含 WordPress 核心、数据库、`wp-config.php`、上传文件或任何凭据。请勿提交这些。
 
