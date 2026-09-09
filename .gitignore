@@ -31,3 +31,7 @@ puffgoods-frontend-design.md
 puffgoods-logo.png
 puffgoods-orig.webp
 *.zip
+
+# ---- 货盘/素材源数据(不进入公开仓库) ----
+pg-assets/
+*.xlsx

@@ -15,19 +15,111 @@ add_filter( 'body_class', function( $classes ) {
     return $classes;
 } );
 
+/* ---------------- SEO 标题优化:避免品牌名重复/过长 ---------------- */
+add_filter( 'document_title_separator', function() { return '|'; } );
+add_filter( 'pre_get_document_title', function( $title ) {
+    if ( is_front_page() ) {
+        return get_bloginfo( 'name' );  // 首页仅保留品牌名 "ShopFront"
+    }
+    return $title;
+} );
+
+/* ---------------- 满150包邮,不满150收9.9:免费配送可用时只保留免费 ---------------- */
+add_filter( 'woocommerce_package_rates', function( $rates, $package ) {
+    $has_free = false;
+    foreach ( (array) $rates as $rate ) { if ( $rate->method_id === 'free_shipping' ) { $has_free = true; break; } }
+    if ( $has_free ) {
+        foreach ( (array) $rates as $key => $rate ) { if ( $rate->method_id !== 'free_shipping' ) { unset( $rates[ $key ] ); } }
+    }
+    return $rates;
+}, 10, 2 );
+
 function shopfront_enqueue_assets() {
     if ( is_admin() ) return;
     $base = content_url( 'mu-plugins/shopfront-assets' );
-    wp_enqueue_style( 'pg-common',  $base . '/common.css',  array(), '5.5' );
-    wp_enqueue_style( 'pg-desktop', $base . '/desktop.css', array(), '5.5' );
-    wp_enqueue_style( 'pg-tablet',  $base . '/tablet.css',  array(), '5.5' );
-    wp_enqueue_style( 'pg-mobile',  $base . '/mobile.css',  array(), '5.5' );
-    wp_enqueue_script( 'pg-common',  $base . '/common.js',  array( 'jquery' ), '5.5', true );
-    wp_enqueue_script( 'pg-tablet',  $base . '/tablet.js',  array( 'jquery' ), '5.5', true );
-    wp_enqueue_script( 'pg-desktop', $base . '/desktop.js', array( 'jquery' ), '5.5', true );
-    wp_enqueue_script( 'pg-mobile',  $base . '/mobile.js',  array( 'jquery' ), '5.5', true );
+    wp_enqueue_style( 'pg-common',  $base . '/common.css',  array(), '8.37' );
+    wp_enqueue_style( 'pg-desktop', $base . '/desktop.css', array(), '8.37' );
+    wp_enqueue_style( 'pg-tablet',  $base . '/tablet.css',  array(), '8.37' );
+    wp_enqueue_style( 'pg-mobile',  $base . '/mobile.css',  array(), '8.37' );
+    wp_enqueue_script( 'pg-common',  $base . '/common.js',  array( 'jquery' ), '8.37', true );
+    wp_enqueue_script( 'pg-tablet',  $base . '/tablet.js',  array( 'jquery' ), '8.37', true );
+    wp_enqueue_script( 'pg-desktop', $base . '/desktop.js', array( 'jquery' ), '8.37', true );
+    wp_enqueue_script( 'pg-mobile',  $base . '/mobile.js',  array( 'jquery' ), '8.37', true );
 }
-add_action( 'wp_enqueue_scripts', 'shopfront_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'shopfront_enqueue_assets', 100 );
+
+/* 抽屉购物车数量 AJAX 所需的前端数据(必须在 pg-common 入队之后,否则 handle 未注册 localize 会失败) */
+add_action( 'wp_enqueue_scripts', function() {
+    if ( is_admin() ) return;
+    wp_localize_script( 'pg-common', 'PGCART', array(
+        'ajaxurl' => admin_url( 'admin-ajax.php' ),
+        'nonce'   => wp_create_nonce( 'pg_cart_qty' ),
+    ) );
+}, 101 );
+
+/* 抽屉购物车数量加减 AJAX */
+add_action( 'wp_ajax_pg_cart_qty', 'shopfront_cart_qty_ajax' );
+add_action( 'wp_ajax_nopriv_pg_cart_qty', 'shopfront_cart_qty_ajax' );
+function shopfront_cart_qty_ajax() {
+    check_ajax_referer( 'pg_cart_qty', 'nonce' );
+    if ( function_exists( 'wc_load_cart' ) ) { wc_load_cart(); }   // 强制从会话加载购物车
+    $key = isset( $_POST['key'] ) ? sanitize_text_field( wp_unslash( $_POST['key'] ) ) : '';
+    $qty = isset( $_POST['qty'] ) ? absint( $_POST['qty'] ) : 1;
+    if ( $key && function_exists( 'WC' ) && WC()->cart ) {
+        if ( $qty < 1 ) {
+            WC()->cart->remove_cart_item( $key );
+        } else {
+            WC()->cart->set_quantity( $key, $qty );
+        }
+        WC()->cart->calculate_totals();
+    }
+    ob_start();
+    shopfront_mini_cart();
+    $mini = ob_get_clean();
+    wp_send_json( array(
+        'mini'  => $mini,
+        'count' => function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_contents_count() : 0,
+        'total' => function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_subtotal() : '',
+    ) );
+}
+
+/* 抽屉购物车已改用自定义容器,不由 WooCommerce fragment 替换(避免 replaceWith 把容器移除)。
+   角标数量仍由下方的 shopfront_cart_fragment 单独更新。 */
+
+/* 自建抽屉 mini-cart：图片在左 / 标题+单价+数量在右 / 删除在最右侧 */
+function shopfront_mini_cart() {
+    if ( ! function_exists( 'WC' ) || ! WC()->cart ) return;
+    if ( WC()->cart->is_empty() ) {
+        echo '<p class="woocommerce-mini-cart__empty-message">' . esc_html__( 'No products in the cart.', 'woocommerce' ) . '</p>';
+        return;
+    }
+    echo '<ul class="woocommerce-mini-cart cart_list product_list_widget">';
+    foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+        $_product = $cart_item['data'];
+        if ( ! $_product || ! $_product->exists() ) continue;
+        $name  = apply_filters( 'woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key );
+        $thumb = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image( 'woocommerce_thumbnail' ), $cart_item, $cart_item_key );
+        $price = apply_filters( 'woocommerce_cart_item_price', WC()->cart->get_product_price( $_product ), $cart_item, $cart_item_key );
+        $qty   = (int) $cart_item['quantity'];
+        $plink = get_permalink( $_product->get_id() );
+        $remove_url = esc_url( wc_get_cart_remove_url( $cart_item_key ) );
+        echo '<li class="pg-mc-item" data-cart_item_key="' . esc_attr( $cart_item_key ) . '">';
+        echo '<a class="pg-mc-remove" href="' . $remove_url . '" aria-label="Remove" data-cart_item_key="' . esc_attr( $cart_item_key ) . '">&times;</a>';
+        echo '<a class="pg-mc-link" href="' . esc_url( $plink ) . '">' . $thumb . '</a>';
+        echo '<div class="pg-mc-body">';
+        echo '<a class="pg-mc-title" href="' . esc_url( $plink ) . '">' . esc_html( $name ) . '</a>';
+        echo '<div class="pg-mc-price">' . wp_kses_post( $price ) . '</div>'; // 单价
+        echo '<div class="pg-mc-qty"><button type="button" class="mc-qty-btn mc-minus" aria-label="Decrease">&#8722;</button><span class="mc-qty">' . $qty . '</span><button type="button" class="mc-qty-btn mc-plus" aria-label="Increase">&#43;</button></div>';
+        echo '</div>';
+        echo '</li>';
+    }
+    echo '</ul>';
+    echo '<p class="woocommerce-mini-cart__total"><strong>' . esc_html__( 'Subtotal', 'woocommerce' ) . ':</strong> ' . wp_kses_post( WC()->cart->get_cart_subtotal() ) . '</p>';
+    echo '<div class="woocommerce-mini-cart__buttons">'
+       . '<a href="' . esc_url( wc_get_cart_url() ) . '" class="button wc-forward">' . esc_html__( 'View cart', 'woocommerce' ) . '</a>'
+       . '<a href="' . esc_url( wc_get_checkout_url() ) . '" class="button checkout wc-forward">' . esc_html__( 'Checkout', 'woocommerce' ) . '</a>'
+       . '</div>';
+}
 
 
 /* ---------------- 产品轮播短代码 ---------------- */
@@ -71,7 +163,7 @@ function shopfront_footer_drawer() {
     <div class="pg-cartmask"></div>
     <div class="pg-drawer">
       <button class="pg-drawer-close" type="button">&times;</button>
-      <div class="widget_shopping_cart_content"><?php woocommerce_mini_cart(); ?></div>
+      <div class="pg-mini-cart-content"><?php shopfront_mini_cart(); ?></div>
     </div>
     <button class="pg-header-cart pg-open-cart" type="button" aria-label="Cart">
       <span class="pg-cart-ico">&#128722;</span>
@@ -98,7 +190,7 @@ function shopfront_footer() {
         <div class="pg-grid">
           <div>
             <h4>ShopFront</h4>
-            <p style="color:#94a3b8;margin:0;">Melbourne-based store for premium tobacco &amp; vape. Free shipping over <b>AUD $80</b>.</p>
+            <p style="color:#94a3b8;margin:0;">Melbourne-based store for premium tobacco &amp; vape. Free shipping over <b>AUD $150</b>.</p>
           </div>
           <div>
             <h4>Shop</h4>
@@ -125,15 +217,35 @@ function shopfront_footer() {
             </ul>
           </div>
         </div>
-        <div class="pg-payments">
-          <span>VISA</span><span>Mastercard</span><span>PayPal</span><span>Stripe</span><span>Apple Pay</span><span>Google Pay</span>
-        </div>
         <div class="pg-bottom">
-          <span>&copy; 2026 ShopFront. All rights reserved. Melbourne, Victoria, Australia. <a href="mailto:hello@example.com">hello@example.com</a>.</span>
+          <span>&copy; 2026 ShopFront. All rights reserved. Melbourne, Victoria, Australia. <a href="mailto:support@example.com">support@example.com</a>.</span>
           <span class="pg-pay">&#127183; AUD &#183; 18+ Only</span>
+          <span class="pg-payments" aria-label="Accepted payment methods">
+            <span class="pg-pay-chip" title="Visa"><svg viewBox="0 0 32 20" width="30" height="18"><rect width="32" height="20" rx="2.5" fill="#1a1f71"/><text x="16" y="14.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="800" font-style="italic" fill="#fff">VISA</text></svg></span>
+            <span class="pg-pay-chip" title="Mastercard"><svg viewBox="0 0 32 20" width="30" height="18"><circle cx="12" cy="10" r="8" fill="#eb001b"/><circle cx="20" cy="10" r="8" fill="#f79e1b"/></svg></span>
+            <span class="pg-pay-chip" title="PayPal"><svg viewBox="0 0 32 20" width="30" height="18"><text x="16" y="14" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="800" fill="#003087">Pay<tspan fill="#009cde">Pal</tspan></text></svg></span>
+            <span class="pg-pay-chip" title="Apple Pay"><svg viewBox="0 0 32 20" width="30" height="18"><text x="16" y="14" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="12" fill="#000">&#63743;<tspan font-size="11" font-weight="600"> Pay</tspan></text></svg></span>
+            <span class="pg-pay-chip" title="Google Pay"><svg viewBox="0 0 32 20" width="30" height="18"><text x="16" y="14" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="800"><tspan fill="#4285f4">G</tspan><tspan fill="#5f6368"> Pay</tspan></text></svg></span>
+            <span class="pg-pay-chip" title="Stripe"><svg viewBox="0 0 32 20" width="30" height="18"><text x="16" y="14" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="800" fill="#635bff">stripe</text></svg></span>
+          </span>
         </div>
       </div>
     </footer>
     <?php
 }
 add_action( 'wp_footer', 'shopfront_footer', 20 );
+
+/* 抽屉购物车完整刷新 AJAX(加购后重绘整个抽屉,确保显示全部商品) */
+add_action( 'wp_ajax_pg_cart_refresh', 'shopfront_cart_refresh' );
+add_action( 'wp_ajax_nopriv_pg_cart_refresh', 'shopfront_cart_refresh' );
+function shopfront_cart_refresh() {
+    if ( function_exists( 'wc_load_cart' ) ) { wc_load_cart(); }
+    check_ajax_referer( 'pg_cart_qty', 'nonce' );
+    ob_start();
+    shopfront_mini_cart();
+    $mini = ob_get_clean();
+    wp_send_json( array(
+        'mini'  => $mini,
+        'count' => function_exists( 'WC' ) && WC()->cart ? WC()->cart->get_cart_contents_count() : 0,
+    ) );
+}
